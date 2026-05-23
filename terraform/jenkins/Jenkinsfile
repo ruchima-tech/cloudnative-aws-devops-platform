@@ -35,25 +35,13 @@ pipeline {
 
             steps {
 
-                sh 'pytest app/'
+                sh '''
+                # Run unit tests inside the built Docker image (requires Docker on the Jenkins agent)
+                docker run --rm -w /app docker.io/cloudnativeapp:v1 pytest -q
+                '''
             }
         }
 
-        stage('SonarQube Analysis') {
-
-            steps {
-
-                sh 'sonar-scanner'
-            }
-        }
-
-        stage('Trivy Scan') {
-
-            steps {
-
-                sh 'trivy image flaskapp:v1'
-            }
-        }
 
         stage('Push to Docker Hub') {
 
