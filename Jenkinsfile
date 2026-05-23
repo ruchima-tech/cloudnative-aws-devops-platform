@@ -4,11 +4,7 @@ pipeline {
 
     environment {
 
-        
-
         IMAGE_NAME = "cloudnativeapp"
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-
         DOCKERHUB_USERNAME = "ruchima2304"
         
     }
@@ -47,31 +43,33 @@ pipeline {
 
             steps {
 
-                sh '''
-                echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-                '''
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh '''
+                    echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                    '''
 
-                sh '''
-                docker tag docker.io/cloudnativeapp:v1 \
-                $DOCKERHUB_USERNAME/cloudnativeapp:v1
-                '''
+                    sh '''
+                    docker tag docker.io/cloudnativeapp:v1 \
+                    $DOCKERHUB_USERNAME/cloudnativeapp:v1
+                    '''
 
-                sh '''
-                docker tag docker.io/cloudnativeapp:v1 \
-                $DOCKERHUB_USERNAME/cloudnativeapp:latest
-                '''
+                    sh '''
+                    docker tag docker.io/cloudnativeapp:v1 \
+                    $DOCKERHUB_USERNAME/cloudnativeapp:latest
+                    '''
 
-                sh '''
-                docker push $DOCKERHUB_USERNAME/cloudnativeapp:v1
-                '''
+                    sh '''
+                    docker push $DOCKERHUB_USERNAME/cloudnativeapp:v1
+                    '''
 
-                sh '''
-                docker push $DOCKERHUB_USERNAME/cloudnativeapp:latest
-                '''
+                    sh '''
+                    docker push $DOCKERHUB_USERNAME/cloudnativeapp:latest
+                    '''
 
-                sh '''
-                docker logout
-                '''
+                    sh '''
+                    docker logout
+                    '''
+                }
             }
         }
 
